@@ -8,8 +8,6 @@ import {
   Users,
   ListMusic,
   PlayCircle,
-  Bell,
-  Search,
   Settings,
   LogOut,
   TrendingUp,
@@ -17,7 +15,7 @@ import {
   Album,
 } from "lucide-react";
 
-export default function AnalyticsPage() {
+export default function AlbumsPage() {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -32,7 +30,12 @@ export default function AnalyticsPage() {
     { name: "Settings", href: "/admins/settings", icon: <Settings size={18} /> },
   ];
 
-  const data = [40, 70, 55, 90, 120, 80, 60];
+  const albums = [
+    { title: "Timeless", artist: "Davido", year: 2023 },
+    { title: "Mr. Money With The Vibe", artist: "Asake", year: 2022 },
+    { title: "Made in Lagos", artist: "Wizkid", year: 2020 },
+    { title: "Love, Damini", artist: "Burna Boy", year: 2022 },
+  ];
 
   return (
     <div className="min-h-screen bg-[#121212] text-white flex">
@@ -74,7 +77,7 @@ export default function AnalyticsPage() {
 
         <button
           onClick={() => router.push("/login")}
-          className="text-red-400 mt-6 flex items-center gap-2"
+          className="flex items-center gap-2 text-red-400 mt-6"
         >
           <LogOut size={18} />
           Logout
@@ -84,18 +87,23 @@ export default function AnalyticsPage() {
       {/* MAIN */}
       <main className="flex-1 p-8">
 
-        <h1 className="text-2xl font-bold mb-6">Analytics</h1>
+        <h1 className="text-2xl font-bold mb-6">Albums</h1>
 
-        <div className="bg-[#181818] p-6 rounded-2xl border border-zinc-800">
-          <div className="h-64 flex items-end gap-4">
-            {data.map((h, i) => (
-              <div
-                key={i}
-                className="bg-[#1DB954] flex-1 rounded-t-lg"
-                style={{ height: `${h}%` }}
-              />
-            ))}
-          </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {albums.map((album) => (
+            <div
+              key={album.title}
+              className="bg-[#181818] p-6 rounded-2xl border border-zinc-800 hover:bg-zinc-900 transition"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <Album className="text-[#1DB954]" />
+                <h2 className="text-lg font-semibold">{album.title}</h2>
+              </div>
+
+              <p className="text-zinc-400">{album.artist}</p>
+              <p className="text-zinc-500 text-sm mt-2">{album.year}</p>
+            </div>
+          ))}
         </div>
 
       </main>

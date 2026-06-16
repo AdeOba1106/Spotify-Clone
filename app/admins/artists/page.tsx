@@ -45,40 +45,49 @@ export default function ArtistsPage() {
     <div className="min-h-screen bg-[#121212] text-white flex">
 
       {/* SIDEBAR */}
-      <aside className="w-64 h-screen sticky top-0 bg-[#181818] border-r border-zinc-800 p-6 flex flex-col">
-        <div className="flex items-center gap-2 mb-10">
-          <div className="w-9 h-9 bg-[#1DB954] rounded-lg flex items-center justify-center">
-            <Music size={18} className="text-black" />
-          </div>
-          <h1 className="text-xl font-bold">Spotify Admin</h1>
-        </div>
-
-        <nav className="space-y-2 flex-1">
-          {menu.map((item) => {
-            const isActive = pathname === item.href;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 p-3 rounded-xl transition
-                ${isActive ? "bg-[#1DB954] text-black" : "text-zinc-300 hover:bg-zinc-800"}`}
-              >
-                {item.icon}
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <button
-          onClick={() => router.push("/login")}
-          className="flex items-center gap-2 text-red-400 mt-6"
-        >
-          <LogOut size={18} />
-          Logout
-        </button>
-      </aside>
+  {/* SIDEBAR */}
+        <aside className="w-64 h-screen sticky top-0 bg-[#181818] border-r border-zinc-800 p-6 flex flex-col">
+  
+          <div className="flex items-center gap-2 mb-10">
+                   <div className="w-9 h-9 bg-[#1DB954] rounded-lg flex items-center justify-center">
+                      <Image
+                                 src="/icons8-spotify-96.png"
+                                 alt="Spotify"
+                                 width={40}
+                                 height={40}
+                                 className=" h-auto w-8 cursor-pointer"
+                               />
+                   </div>
+                   <h1 className="text-xl font-bold">Spotify Admin</h1>
+                 </div>
+         
+  
+          <nav className="space-y-2 flex-1">
+            {menu.map((item) => {
+              const isActive = pathname === item.href;
+  
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 p-3 rounded-xl
+                  ${isActive ? "bg-[#1DB954] text-black" : "text-zinc-300 hover:bg-zinc-800"}`}
+                >
+                  {item.icon}
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+  
+          <button
+            onClick={() => router.push("/login")}
+            className="text-red-400 mt-6 flex items-center gap-2"
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </aside>
 
       {/* MAIN */}
       <main className="flex-1 p-8">

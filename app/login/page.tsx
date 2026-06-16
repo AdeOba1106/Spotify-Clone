@@ -24,7 +24,7 @@ export default function LoginPage() {
       const token = response.data.access_token;
       localStorage.setItem("token", token);
 
-      router.push("/admins/dashboard");
+      router.push("/admins");
     } catch (err) {
       console.error("Login failed", err);
       setMessage("Invalid email or password");

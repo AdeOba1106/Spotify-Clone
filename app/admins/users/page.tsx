@@ -49,10 +49,19 @@ export default function UsersPage() {
       {/* SIDEBAR */}
       <aside className="w-64 h-screen sticky top-0 bg-[#181818] border-r border-zinc-800 p-6 flex flex-col">
 
-        <div className="flex items-center gap-2 mb-10">
-          <Image src="/icons8-spotify-96.png" alt="logo" width={30} height={30} />
-          <h1 className="text-xl font-bold">Spotify Admin</h1>
-        </div>
+         <div className="flex items-center gap-2 mb-10">
+                  <div className="w-9 h-9 bg-[#1DB954] rounded-lg flex items-center justify-center">
+                     <Image
+                                src="/icons8-spotify-96.png"
+                                alt="Spotify"
+                                width={40}
+                                height={40}
+                                className=" h-auto w-8 cursor-pointer"
+                              />
+                  </div>
+                  <h1 className="text-xl font-bold">Spotify Admin</h1>
+                </div>
+        
 
         <nav className="space-y-2 flex-1">
           {menu.map((item) => {

@@ -95,7 +95,7 @@ export default function Page() {
             type="submit"
             className="w-full bg-[#1DB954] hover:scale-[1.02] transition text-black font-bold py-3 rounded-full"
           >
-          <Link href="/landingpage">Sign Up</Link>  
+          <Link href="/">Sign Up</Link>  
           </button>
         </form>
 
