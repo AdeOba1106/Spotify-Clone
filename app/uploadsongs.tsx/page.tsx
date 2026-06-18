@@ -14,7 +14,7 @@ export default function Page() {
 
   const router = useRouter();
 
-  // check auth
+  // check authsjs
   useEffect(() => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getUser();
