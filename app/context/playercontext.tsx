@@ -38,6 +38,8 @@ type PlayerContextType = {
 
   volume: number;
   setVolume: (v: number) => void;
+
+  stopPlayer: () => void;
 };
 
 const PlayerContext = createContext<PlayerContextType | null>(null);
@@ -58,6 +60,17 @@ export const PlayerProvider = ({ children }: any) => {
   const [duration, setDuration] = useState(0);
 
   const [volume, setVolumeState] = useState(100);
+
+  const stopPlayer = () => {
+  if (soundRef.current) {
+    soundRef.current.stop();
+  }
+
+  setIsPlaying(false);
+  setCurrentSong(null);
+  setCurrentTime(0);
+  setDuration(0);
+};
 
   // 🎵 PLAY SONG
   const playSong = (song: Song, index = 0, list: Song[] = []) => {
@@ -196,6 +209,7 @@ export const PlayerProvider = ({ children }: any) => {
 
         volume,
         setVolume,
+        stopPlayer,
       }}
     >
       {children}
