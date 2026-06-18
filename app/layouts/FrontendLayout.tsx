@@ -1,11 +1,16 @@
 "use client";
-import MusicPlayer from "@/components/MusicPlayer";
-import Navbar from "@/components/Navbar";
-import Queue from "@/components/Queue";
-import Sidebar from "@/components/Sidebar";
-import { Song } from "@/types/song";
+import MusicPlayer from "../components/MusicPlayer";
+import Navbar from "../components/navbar";
+// import Queue from "@/components/Queue";
+import Sidebar from "../components/sidebar";
+// import { Song } from "../types/song";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { createContext, useEffect, useState } from "react";
+export interface Song {
+  id: string;
+  title: string;
+  artist: string;
+}
 
 type PlayerContextType = {
   currentMusic: Song | null;
@@ -23,7 +28,7 @@ type PlayerContextType = {
 };
 
 export const PlayerContext = createContext<PlayerContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export default function FrontendLayout({
@@ -77,7 +82,7 @@ export default function FrontendLayout({
           {isMusicPlaying && <MusicPlayer />}
           <main>
             <Sidebar />
-            <Queue />
+            {/* <Queue /> */}
             {children}
           </main>
         </PlayerContext.Provider>

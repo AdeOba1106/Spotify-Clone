@@ -2,8 +2,7 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// import { supabase } from "../../../lib/SupabaseClient";
-// import useUserSession from "../../../custom-hooks/useUserSession";
+import { supabase } from "../music/supabase";
 
 export default function Page() {
   const [title, setTitle] = useState("");
@@ -11,29 +10,28 @@ export default function Page() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
-  const [Loading, setLoading] = useState(false);
-  const router = useRouter();
-  const { session } = useUserSession();
+  const [loading, setLoading] = useState(false);
 
-  //check auth
+  const router = useRouter();
+
+  // check auth
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+
+      if (!data.user) {
         router.push("/login");
       }
-    });
+    };
+
+    checkUser();
   }, [router]);
 
   const handleUpload = async (e: React.FormEvent) => {
-    setLoading(true);
     e.preventDefault();
-    //validate inputs
-    if (
-      !title.trim() ||
-      !artist.trim() ||      
-      !imageFile ||
-      !audioFile
-    ) {
+    setLoading(true);
+
+    if (!title.trim() || !artist.trim() || !imageFile || !audioFile) {
       setMessage("All fields are required!");
       setLoading(false);
       return;
@@ -42,69 +40,83 @@ export default function Page() {
     try {
       const timestamp = Date.now();
 
-      //upload the image
-      const imagepath = `images/${timestamp}_${imageFile.name}`;
-      const { error: imgError } = await supabase.storage
-        .from("cover-images")
-        .upload(imagepath, imageFile);
+      // GET USER (FIX FOR YOUR ERROR)
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
 
-      if (imgError) {
-        setMessage(imgError.message);
-        console.log("Image Error:" + imgError.message);
+      if (!userId) {
+        setMessage("User not authenticated");
         setLoading(false);
         return;
       }
 
-      //generate image URL
-      const {
-        data: { publicUrl: imageUrl },
-      } = supabase.storage.from("cover-images").getPublicUrl(imagepath);
+      // upload image
+      const imagePath = `images/${timestamp}_${imageFile.name}`;
 
-      //upload song audio
+      const { error: imgError } = await supabase.storage
+        .from("cover-images")
+        .upload(imagePath, imageFile);
+
+      if (imgError) {
+        setMessage(imgError.message);
+        setLoading(false);
+        return;
+      }
+
+      const { data: imageData } = supabase.storage
+        .from("cover-images")
+        .getPublicUrl(imagePath);
+
+      const imageUrl = imageData.publicUrl;
+
+      // upload audio
       const audioPath = `audio/${timestamp}_${audioFile.name}`;
+
       const { error: audioError } = await supabase.storage
         .from("songs")
         .upload(audioPath, audioFile);
 
       if (audioError) {
         setMessage(audioError.message);
-        console.log("Audio Error:" + audioError.message);
         setLoading(false);
         return;
       }
 
-      //generate song URL
-      const {
-        data: { publicUrl: audioUrl },
-      } = supabase.storage.from("songs").getPublicUrl(audioPath);
+      const { data: audioData } = supabase.storage
+        .from("songs")
+        .getPublicUrl(audioPath);
 
-      //save songs to table
+      const audioUrl = audioData.publicUrl;
+
+      // insert into DB
       const { error: dbError } = await supabase.from("songs").insert({
         title,
-        artist,        
+        artist,
         cover_image_url: imageUrl,
         audio_url: audioUrl,
-        user_id: session?.user.id,
+        user_id: userId,
       });
 
       if (dbError) {
         setMessage(dbError.message);
-        console.log("Table Error:" + dbError.message);
         setLoading(false);
         return;
       }
 
+      // reset
       setTitle("");
       setArtist("");
       setImageFile(null);
       setAudioFile(null);
       setMessage("Song uploaded successfully!");
+
       setTimeout(() => {
         router.push("/");
-      }, 2000);
-      setLoading(false);
+      }, 1500);
     } catch (err) {
-      console.log("Catched Error:" + err);
+      console.log(err);
+      setMessage("Unexpected error occurred");
+    } finally {
       setLoading(false);
     }
   };
@@ -119,6 +131,7 @@ export default function Page() {
           alt="logo"
           className="w-11 h-11"
         />
+
         <h2 className="text-3xl font-bold text-white my-2 mb-8 text-center">
           Upload to Spotify
         </h2>
@@ -129,59 +142,45 @@ export default function Page() {
               {message}
             </p>
           )}
+
           <input
             type="text"
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="outline-none border-1 border-neutral-600 p-2 w-full m-auto rounded-md text-primary-text placeholder-neutral-600 mb-6 focus:border-secondary-text"
+            className="outline-none border-1 border-neutral-600 p-2 w-full rounded-md mb-6"
           />
+
           <input
             type="text"
             placeholder="Artist Name"
             value={artist}
             onChange={(e) => setArtist(e.target.value)}
-            className="outline-none border-1 border-neutral-600 p-2 w-full m-auto rounded-md text-primary-text placeholder-neutral-600 mb-6 focus:border-secondary-text"
-          />       
-          <label htmlFor="audio" className="block py-2 text-secondary-text">
-            Audio
-          </label>
+            className="outline-none border-1 border-neutral-600 p-2 w-full rounded-md mb-6"
+          />
+
+          <label className="block py-2">Audio</label>
           <input
             type="file"
-            id="audio"
             accept="audio/*"
-            onChange={(e) => {
-              const files = e.target.files;
-              if (!files) return;
-              const file = files[0];
-              setAudioFile(file);
-            }}
-            className="outline-none border-1 border-neutral-600 p-2 w-full m-auto rounded-md text-primary-text placeholder-neutral-600 mb-6 focus:border-secondary-text"
+            onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
+            className="mb-6"
           />
-          <label htmlFor="cover" className="block py-2 text-secondary-text">
-            Cover Image
-          </label>
+
+          <label className="block py-2">Cover Image</label>
           <input
             type="file"
-            id="images"
             accept="image/*"
-            onChange={(e) => {
-              const files = e.target.files;
-              if (!files) return;
-              const file = files[0];
-              setImageFile(file);
-            }}
-            className="outline-none border-1 border-neutral-600 p-2 w-full m-auto rounded-md text-primary-text placeholder-neutral-600 mb-6 focus:border-secondary-text"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            className="mb-6"
           />
-          {Loading ? (
-            <button className="bg-primary py-3 rounded-full w-full font-bold cursor-pointer">
-              Uploading...
-            </button>
-          ) : (
-            <button className="bg-primary py-3 rounded-full w-full font-bold cursor-pointer">
-              Add Song
-            </button>
-          )}
+
+          <button
+            className="bg-primary py-3 rounded-full w-full font-bold"
+            disabled={loading}
+          >
+            {loading ? "Uploading..." : "Add Song"}
+          </button>
         </form>
       </div>
     </div>
