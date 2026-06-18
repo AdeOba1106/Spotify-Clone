@@ -34,11 +34,11 @@ export default function MusicPlayer() {
 
   if (!currentSong) return null;
 
-  const formatTime = (s) => {
-    const m = Math.floor(s / 60);
-    const sec = Math.floor(s % 60);
-    return `${m}:${sec.toString().padStart(2, "0")}`;
-  };
+const formatTime = (s: number = 0): string => {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, "0")}`;
+};
 
   return (
     <div className="fixed bottom-0 left-0 w-full h-24 bg-[#181818] border-t border-zinc-800 z-50 flex items-center px-4">
