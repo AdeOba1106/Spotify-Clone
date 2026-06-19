@@ -40,7 +40,7 @@ export default function Page() {
     try {
       const timestamp = Date.now();
 
-      // GET USER (FIX FOR YOUR ERROR)
+      // GET USER (FIX FOR YOUR ERROR)ddydyd
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData.user?.id;
 
